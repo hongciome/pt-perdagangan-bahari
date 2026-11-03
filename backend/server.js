@@ -11,12 +11,11 @@ const apiLimiter = rateLimit({
   message: { success: false, message: 'Terlalu banyak percobaan dari IP ini, silakan coba lagi nanti.' }
 });
 app.use('/api/', apiLimiter);
-
 app.use(express.json());
 
 const usersDB = [
-  { id: 1, username: 'sigit_owner', role: 'owner', password: 'rahasia123' },
-  { id: 2, username: 'admin_bahari', role: 'admin', password: 'rahasia123' }
+  { id: 1, username: 'sigit_owner', role: 'Owner', password: 'rahasia123' },
+  { id: 2, username: 'admin_bahari', role: 'Admin', password: 'rahasia123' }
 ];
 
 const registeredAccountsDB = [];
@@ -44,7 +43,7 @@ app.post('/api/login', (req, res) => {
 app.post('/api/register-user', (req, res) => {
   const { requesterRole, newUsername, newPassword, newRole } = req.body;
 
-  if (requesterRole !== 'owner' && requesterRole !== 'admin') {
+  if (requesterRole !== 'Owner' && requesterRole !== 'Admin') {
     return res.status(403).json({ 
       success: false, 
       message: 'Akses ditolak! Hanya Owner atau Admin yang berhak mendaftarkan akun baru.' 
