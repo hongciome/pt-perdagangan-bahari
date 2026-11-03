@@ -5,39 +5,43 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: 'sans-serif', color: '#1e293b' }}>
+    <div className="min-h-screen bg-[#F8FAFC] flex text-slate-800 font-sans">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <header style={{ height: '60px', background: '#fff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', position: 'sticky', top: 0, zIndex: 30 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+      <div className="flex-1 flex flex-col md:pl-64">
+        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
+          <div className="flex items-center gap-3">
             <button 
               onClick={() => setSidebarOpen(true)}
-              style={{ background: 'none', border: '1px solid #cbd5i1', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
+              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none border border-slate-200"
             >
               ☰
             </button>
-            <span style={{ fontWeight: 600, color: '#475569' }}>SEAFOOD OS / Dashboard</span>
+            <span className="font-semibold text-slate-700 text-sm md:text-base">SEAFOOD OS / Dashboard</span>
           </div>
-          <div style={{ fontSize: '14px', fontWeight: 500 }}>
-            Sigit Prakoso <span style={{ color: '#64748b', fontSize: '12px' }}>(Owner)</span>
+          <div className="text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
+            Sigit Prakoso <span className="text-xs text-blue-600 font-semibold">(Owner)</span>
           </div>
         </header>
 
-        <main style={{ padding: '25px' }}>
-          <h2 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>Dashboard Overview</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px' }}>
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Total Revenue</p>
-              <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Rp 0</p>
+        <main className="p-6 md:p-8">
+          <div className="mb-6">
+            <h2 className="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
+            <p className="text-sm text-slate-500 mt-1">Sistem manajemen terpadu PT Perdagangan Bahari Koh Ahong.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Revenue</p>
+              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
             </div>
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Gross Profit</p>
-              <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Rp 0</p>
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Gross Profit</p>
+              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
             </div>
-            <div style={{ background: '#fff', padding: '20px', borderRadius: '10px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
-              <p style={{ fontSize: '12px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 0 5px 0' }}>Net Profit</p>
-              <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0 }}>Rp 0</p>
+            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Net Profit</p>
+              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
             </div>
           </div>
         </main>
