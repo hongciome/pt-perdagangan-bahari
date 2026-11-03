@@ -5,43 +5,43 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex text-slate-800 font-sans">
+    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', fontFamily: 'system-ui, -apple-system, sans-serif', color: '#1e293b' }}>
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex-1 flex flex-col md:pl-64">
-        <header className="bg-white border-b border-slate-200 h-16 flex items-center justify-between px-6 sticky top-0 z-30 shadow-sm">
-          <div className="flex items-center gap-3">
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <header style={{ height: '64px', backgroundColor: '#ffffff', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px', position: 'sticky', top: 0, zIndex: 30, boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button 
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 rounded-lg text-slate-600 hover:bg-slate-100 focus:outline-none border border-slate-200"
+              style={{ backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px 10px', borderRadius: '6px', cursor: 'pointer', fontSize: '16px', fontWeight: 'bold' }}
             >
               ☰
             </button>
-            <span className="font-semibold text-slate-700 text-sm md:text-base">SEAFOOD OS / Dashboard</span>
+            <span style={{ fontWeight: '600', color: '#334155', fontSize: '15px' }}>SEAFOOD OS / Dashboard</span>
           </div>
-          <div className="text-sm font-medium text-slate-700 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200">
-            Sigit Prakoso <span className="text-xs text-blue-600 font-semibold">(Owner)</span>
+          <div style={{ fontSize: '13px', fontWeight: '500', color: '#334155', backgroundColor: '#f1f5f9', padding: '6px 12px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+            Sigit Prakoso <span style={{ color: '#2563eb', fontWeight: '600' }}>(Owner)</span>
           </div>
         </header>
 
-        <main className="p-6 md:p-8">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-slate-900">Dashboard Overview</h2>
-            <p className="text-sm text-slate-500 mt-1">Sistem manajemen terpadu PT Perdagangan Bahari Koh Ahong.</p>
+        <main style={{ padding: '32px' }}>
+          <div style={{ marginBottom: '24px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: '#0f172a', margin: '0 0 6px 0' }}>Dashboard Overview</h2>
+            <p style={{ fontSize: '14px', color: '#64748b', margin: 0 }}>Sistem manajemen terpadu PT Perdagangan Bahari Koh Ahong.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Total Revenue</p>
-              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '20px' }}>
+            <div style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px 0' }}>Total Revenue</p>
+              <p style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Rp 0</p>
             </div>
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Gross Profit</p>
-              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
+            <div style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px 0' }}>Gross Profit</p>
+              <p style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Rp 0</p>
             </div>
-            <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
-              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Net Profit</p>
-              <p className="text-3xl font-extrabold text-slate-900 mt-2">Rp 0</p>
+            <div style={{ backgroundColor: '#ffffff', padding: '24px', borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}>
+              <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '0 0 8px 0' }}>Net Profit</p>
+              <p style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: 0 }}>Rp 0</p>
             </div>
           </div>
         </main>

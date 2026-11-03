@@ -4,36 +4,38 @@ export default function Sidebar({ isOpen, onClose }) {
   return (
     <>
       {isOpen && (
-        <div onClick={onClose} className="fixed inset-0 bg-black/50 z-40 md:hidden transition-opacity" />
+        <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 40 }} />
       )}
-      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 ease-in-out md:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+      <aside style={{
+        position: 'fixed', top: 0, bottom: 0, left: 0, width: '260px',
+        backgroundColor: '#0f172a', color: '#ffffff', zIndex: 50, display: 'flex', flexDirection: 'column',
+        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform 0.3s ease-in-out',
+        boxShadow: '4px 0 10px rgba(0,0,0,0.1)'
+      }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h2 className="font-bold text-lg tracking-wider text-white">SEAFOOD OS</h2>
-            <p className="text-xs text-slate-400">PT Perdagangan Bahari</p>
+            <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0, letterSpacing: '0.5px' }}>SEAFOOD OS</h2>
+            <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 0 0' }}>PT Perdagangan Bahari</p>
           </div>
-          <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white text-xl font-bold p-1">✕</button>
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '18px', cursor: 'pointer', padding: '4px' }}>✕</button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-6 text-sm">
-          <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Utama</p>
-            <a href="#" className="flex items-center gap-3 px-3 py-2.5 bg-blue-600 text-white rounded-lg font-medium shadow-sm">Overview</a>
-          </div>
-          <div>
-            <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2">Operasional & Bisnis</p>
-            <a href="#" className="block px-3 py-2 text-slate-300 hover:bg-slate-800 rounded-lg transition-colors">Hotel & Customers</a>
-            <a href="#" className="block px-3 py-2 text-slate-300 hover:bg-slate-800 rounded-lg transition-colors">Supplier & Nelayan</a>
-            <a href="#" className="block px-3 py-2 text-slate-300 hover:bg-slate-800 rounded-lg transition-colors">Fish Catalog</a>
-            <a href="#" className="block px-3 py-2 text-slate-300 hover:bg-slate-800 rounded-lg transition-colors">Quotation</a>
-          </div>
+        <div style={{ padding: '20px', flex: 1, overflowY: 'auto' }}>
+          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Utama</p>
+          <a href="#" style={{ display: 'block', padding: '10px 12px', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '8px', textDecoration: 'none', marginBottom: '20px', fontWeight: '500', fontSize: '14px' }}>Overview</a>
+          
+          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '10px' }}>Operasional & Bisnis</p>
+          <a href="#" style={{ display: 'block', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '6px', borderRadius: '6px', fontSize: '14px' }}>Hotel & Customers</a>
+          <a href="#" style={{ display: 'block', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '6px', borderRadius: '6px', fontSize: '14px' }}>Supplier & Nelayan</a>
+          <a href="#" style={{ display: 'block', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '6px', borderRadius: '6px', fontSize: '14px' }}>Fish Catalog</a>
+          <a href="#" style={{ display: 'block', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '6px', borderRadius: '6px', fontSize: '14px' }}>Quotation</a>
         </div>
 
-        <div className="p-4 border-t border-slate-800 bg-slate-950/40 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-emerald-600 flex items-center justify-center font-bold text-white text-sm shadow">SP</div>
+        <div style={{ padding: '15px 20px', borderTop: '1px solid #1e293b', backgroundColor: '#020617', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#fff', fontSize: '14px' }}>SP</div>
           <div>
-            <p className="text-sm font-medium text-white">Sigit Prakoso</p>
-            <p className="text-xs text-emerald-400 font-medium">● Owner Active</p>
+            <p style={{ fontSize: '14px', margin: 0, fontWeight: '500', color: '#fff' }}>Sigit Prakoso</p>
+            <p style={{ fontSize: '11px', color: '#34d399', margin: 0, fontWeight: '500' }}>● Owner Active</p>
           </div>
         </div>
       </aside>
