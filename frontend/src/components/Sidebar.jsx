@@ -10,7 +10,7 @@ export default function Sidebar({ isOpen, onClose }) {
         position: 'fixed', top: 0, bottom: 0, left: 0, width: '260px',
         backgroundColor: '#0f172a', color: '#ffffff', zIndex: 50, display: 'flex', flexDirection: 'column',
         transform: isOpen ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform 0.3s ease-in-out',
-        boxShadow: '4px 0 10px rgba(0,0,0,0.1)'
+        boxShadow: '4px 0 15px rgba(0,0,0,0.2)'
       }}>
         <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
