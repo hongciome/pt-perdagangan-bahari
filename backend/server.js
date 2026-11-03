@@ -13,6 +13,7 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use(express.json());
 
+// Database akun resmi
 const usersDB = [
   { id: 1, username: 'sigit_owner', role: 'Owner', password: 'rahasia123' },
   { id: 2, username: 'admin_bahari', role: 'Admin', password: 'rahasia123' }
@@ -20,11 +21,15 @@ const usersDB = [
 
 const registeredAccountsDB = [];
 
+// Endpoint Login dengan Validasi Ketat (Mencegah password sembarangan masuk)
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   const allUsers = [...usersDB, ...registeredAccountsDB];
+  
+  // Cari user berdasarkan username
   const user = allUsers.find(u => u.username === username);
 
+  // Jika username tidak ditemukan ATAU password tidak cocok, TOLAK!
   if (!user || user.password !== password) {
     return res.status(401).json({ 
       success: false, 
@@ -32,6 +37,7 @@ app.post('/api/login', (req, res) => {
     });
   }
 
+  // Jika lolos verifikasi
   return res.status(200).json({ 
     success: true, 
     message: 'Login berhasil!', 
