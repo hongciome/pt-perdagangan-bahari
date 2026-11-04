@@ -21,15 +21,19 @@ const usersDB = [
 
 const registeredAccountsDB = [];
 
-// Endpoint Login dengan Validasi Ketat (Mencegah password sembarangan masuk)
+// Database penyimpanan transaksi B2B (Suplier / Hotel / Resto)
+const transactionsDB = [
+  { id: '#ORD-2026-001', client: 'Gumaya Tower Hotel', fish: 'Ikan Kakap Merah (Segar) - 50 Kg', total: 'Rp 3.500.000', status: 'Selesai / Dikirim' },
+  { id: '#ORD-2026-002', client: 'Restoran Bahari Indah', fish: 'Ikan Kerapu Macan - 30 Kg', total: 'Rp 4.200.000', status: 'Proses Gudang' },
+  { id: '#ORD-2026-003', client: 'Hotel Santika Semarang', fish: 'Udang Tiger & Cumi Segar - 45 Kg', total: 'Rp 5.800.000', status: 'Menunggu Konfirmasi' }
+];
+
+// Endpoint Login
 app.post('/api/login', (req, res) => {
   const { username, password } = req.body;
   const allUsers = [...usersDB, ...registeredAccountsDB];
-  
-  // Cari user berdasarkan username
   const user = allUsers.find(u => u.username === username);
 
-  // Jika username tidak ditemukan ATAU password tidak cocok, TOLAK!
   if (!user || user.password !== password) {
     return res.status(401).json({ 
       success: false, 
@@ -37,7 +41,6 @@ app.post('/api/login', (req, res) => {
     });
   }
 
-  // Jika lolos verifikasi
   return res.status(200).json({ 
     success: true, 
     message: 'Login berhasil!', 
@@ -46,36 +49,36 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-app.post('/api/register-user', (req, res) => {
-  const { requesterRole, newUsername, newPassword, newRole } = req.body;
+// Endpoint Ambil Daftar Transaksi
+app.get('/api/transactions', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    data: transactionsDB
+  });
+});
 
-  if (requesterRole !== 'Owner' && requesterRole !== 'Admin') {
-    return res.status(403).json({ 
-      success: false, 
-      message: 'Akses ditolak! Hanya Owner atau Admin yang berhak mendaftarkan akun baru.' 
-    });
+// Endpoint Tambah Transaksi Baru
+app.post('/api/transactions', (req, res) => {
+  const { client, fish, total, status } = req.body;
+
+  if (!client || !fish || !total) {
+    return res.status(400).json({ success: false, message: 'Data transaksi tidak lengkap!' });
   }
 
-  const allUsers = [...usersDB, ...registeredAccountsDB];
-  if (allUsers.some(u => u.username === newUsername)) {
-    return res.status(400).json({ 
-      success: false, 
-      message: 'Username sudah digunakan, silakan pilih nama lain.' 
-    });
-  }
-
-  const newUser = {
-    id: allUsers.length + 1,
-    username: newUsername,
-    password: newPassword,
-    role: newRole 
+  const newTransaction = {
+    id: `#ORD-2026-00${transactionsDB.length + 1}`,
+    client,
+    fish,
+    total: total.startsWith('Rp') ? total : `Rp ${total}`,
+    status: status || 'Proses Gudang'
   };
 
-  registeredAccountsDB.push(newUser);
+  transactionsDB.unshift(newTransaction); // Masukkan ke urutan paling atas
 
-  return res.status(201).json({ 
-    success: true, 
-    message: `Akun baru untuk ${newUsername} dengan role [${newRole}] berhasil didaftarkan!` 
+  return res.status(201).json({
+    success: true,
+    message: 'Transaksi berhasil ditambahkan dan disimpan!',
+    data: newTransaction
   });
 });
 
