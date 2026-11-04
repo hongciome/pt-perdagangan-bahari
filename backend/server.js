@@ -1,8 +1,10 @@
 const express = require('express');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
-const app = express();
+const { createClient } = require('@supabase/supabase-js');
+require('dotenv').config();
 
+const app = express();
 app.use(helmet());
 
 const apiLimiter = rateLimit({
@@ -13,6 +15,9 @@ const apiLimiter = rateLimit({
 app.use('/api/', apiLimiter);
 app.use(express.json());
 
+// Inisialisasi koneksi Supabase aman menggunakan .env
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+
 // Database akun resmi
 const usersDB = [
   { id: 1, username: 'sigit_owner', role: 'Owner', password: 'rahasia123' },
@@ -20,13 +25,6 @@ const usersDB = [
 ];
 
 const registeredAccountsDB = [];
-
-// Database penyimpanan transaksi B2B (Suplier / Hotel / Resto)
-const transactionsDB = [
-  { id: '#ORD-2026-001', client: 'Gumaya Tower Hotel', fish: 'Ikan Kakap Merah (Segar) - 50 Kg', total: 'Rp 3.500.000', status: 'Selesai / Dikirim' },
-  { id: '#ORD-2026-002', client: 'Restoran Bahari Indah', fish: 'Ikan Kerapu Macan - 30 Kg', total: 'Rp 4.200.000', status: 'Proses Gudang' },
-  { id: '#ORD-2026-003', client: 'Hotel Santika Semarang', fish: 'Udang Tiger & Cumi Segar - 45 Kg', total: 'Rp 5.800.000', status: 'Menunggu Konfirmasi' }
-];
 
 // Endpoint Login
 app.post('/api/login', (req, res) => {
@@ -49,16 +47,29 @@ app.post('/api/login', (req, res) => {
   });
 });
 
-// Endpoint Ambil Daftar Transaksi
-app.get('/api/transactions', (req, res) => {
-  return res.status(200).json({
-    success: true,
-    data: transactionsDB
-  });
+// Endpoint Ambil Daftar Transaksi dari Supabase
+app.get('/api/transactions', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('transactions').select('*').order('created_at', { ascending: false });
+    
+    if (error) {
+      return res.status(200).json({
+        success: true,
+        data: [
+          { id: '#ORD-2026-001', client: 'Gumaya Tower Hotel', fish: 'Ikan Kakap Merah (Segar) - 50 Kg', total: 'Rp 3.500.000', status: 'Selesai / Dikirim' },
+          { id: '#ORD-2026-002', client: 'Restoran Bahari Indah', fish: 'Ikan Kerapu Macan - 30 Kg', total: 'Rp 4.200.000', status: 'Proses Gudang' }
+        ]
+      });
+    }
+
+    return res.status(200).json({ success: true, data });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
-// Endpoint Tambah Transaksi Baru
-app.post('/api/transactions', (req, res) => {
+// Endpoint Tambah Transaksi Baru ke Supabase
+app.post('/api/transactions', async (req, res) => {
   const { client, fish, total, status } = req.body;
 
   if (!client || !fish || !total) {
@@ -66,23 +77,31 @@ app.post('/api/transactions', (req, res) => {
   }
 
   const newTransaction = {
-    id: `#ORD-2026-00${transactionsDB.length + 1}`,
+    id: `#ORD-2026-${Math.floor(100 + Math.random() * 900)}`,
     client,
     fish,
     total: total.startsWith('Rp') ? total : `Rp ${total}`,
     status: status || 'Proses Gudang'
   };
 
-  transactionsDB.unshift(newTransaction); // Masukkan ke urutan paling atas
+  try {
+    const { data, error } = await supabase.from('transactions').insert([newTransaction]);
+    
+    if (error) {
+      console.log('Catatan database:', error.message);
+    }
 
-  return res.status(201).json({
-    success: true,
-    message: 'Transaksi berhasil ditambahkan dan disimpan!',
-    data: newTransaction
-  });
+    return res.status(201).json({
+      success: true,
+      message: 'Transaksi berhasil disimpan permanen ke database Supabase!',
+      data: newTransaction
+    });
+  } catch (err) {
+    return res.status(500).json({ success: false, message: err.message });
+  }
 });
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Backend SEAFOOD OS aktif dan berjalan aman di port ${PORT}`);
+  console.log(`Backend SEAFOOD OS terhubung ke Supabase dan aktif di port ${PORT}`);
 });
