@@ -1,61 +1,95 @@
-import React from 'react';
+import { Link, useLocation } from 'react-router-dom';
 
-export default function Sidebar({ isOpen, onClose }) {
+export default function Sidebar({ isOpen }) {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+
+  const linkStyle = (path) => ({
+    display: 'flex',
+    alignItems: 'center',
+    gap: '10px',
+    padding: '10px 14px',
+    color: isActive(path) ? '#ffffff' : '#94a3b8',
+    backgroundColor: isActive(path) ? '#2563eb' : 'transparent',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontSize: '13px',
+    fontFamily: 'sans-serif',
+    fontWeight: isActive(path) ? 'bold' : 'normal',
+    marginBottom: '4px',
+    whiteSpace: 'nowrap'
+  });
+
+  const sectionTitleStyle = {
+    fontSize: '10px',
+    fontWeight: 'bold',
+    color: '#475569',
+    letterSpacing: '1px',
+    marginTop: '20px',
+    marginBottom: '8px',
+    textTransform: 'uppercase',
+    whiteSpace: 'nowrap',
+    fontFamily: 'sans-serif'
+  };
+
   return (
-    <>
-      {isOpen && (
-        <div onClick={onClose} style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 40 }} />
-      )}
-      <aside style={{
-        position: 'fixed', top: 0, bottom: 0, left: 0, width: '280px',
-        backgroundColor: '#0f172a', color: '#ffffff', zIndex: 50, display: 'flex', flexDirection: 'column',
-        transform: isOpen ? 'translateX(0)' : 'translateX(-100%)', transition: 'transform 0.3s ease-in-out',
-        boxShadow: '4px 0 15px rgba(0,0,0,0.3)', overflowY: 'auto'
-      }}>
-        <div style={{ padding: '20px', borderBottom: '1px solid #1e293b', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <h2 style={{ fontSize: '18px', fontWeight: 'bold', margin: 0, letterSpacing: '0.5px' }}>SEAFOOD OS</h2>
-            <p style={{ fontSize: '11px', color: '#94a3b8', margin: '2px 0 0 0' }}>Procurement & BI</p>
+    <aside style={{ 
+      width: isOpen ? '260px' : '0px', 
+      backgroundColor: '#090d16', 
+      color: 'white', 
+      height: '100vh', 
+      padding: isOpen ? '20px' : '0px', 
+      boxSizing: 'border-box',
+      transition: 'all 0.2s ease-in-out',
+      overflowX: 'hidden',
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column',
+      flexShrink: 0,
+      position: 'sticky',
+      top: 0
+    }}>
+      {/* Logo Header */}
+      <div style={{ marginBottom: '20px', minWidth: '220px' }}>
+        <h2 style={{ margin: 0, color: '#38bdf8', fontSize: '18px', fontWeight: 'bold', fontFamily: 'sans-serif' }}>SEAFOOD OS</h2>
+        <span style={{ fontSize: '11px', color: '#64748b', fontFamily: 'sans-serif' }}>PT Perdagangan Bahari</span>
+      </div>
+
+      {/* Menu Navigation */}
+      <div style={{ flex: 1, minWidth: '220px' }}>
+        <div style={{ ...sectionTitleStyle, marginTop: 0 }}>UTAMA</div>
+        <Link to="/" style={linkStyle('/')}>📊 <span>Overview</span></Link>
+
+        <div style={sectionTitleStyle}>OPERASIONAL & BISNIS</div>
+        <Link to="/customers" style={linkStyle('/customers')}>👥 <span>Hotel & Customers</span></Link>
+        <Link to="/suppliers" style={linkStyle('/suppliers')}>🐟 <span>Supplier & Nelayan</span></Link>
+        <Link to="/catalog" style={linkStyle('/catalog')}>📦 <span>Fish Catalog</span></Link>
+        <Link to="/quotations" style={linkStyle('/quotations')}>📄 <span>Quotation</span></Link>
+
+        <div style={sectionTitleStyle}>RANTAI PASOK & GUDANG</div>
+        <Link to="/orders" style={linkStyle('/orders')}>🛒 <span>Purchase Orders</span></Link>
+        <Link to="/procurement" style={linkStyle('/procurement')}>🏗️ <span>Procurement</span></Link>
+        <Link to="/quality-control" style={linkStyle('/quality-control')}>🛡️ <span>Quality Control</span></Link>
+        <Link to="/inventory" style={linkStyle('/inventory')}>❄️ <span>Inventory (Cold Storage)</span></Link>
+
+        <div style={sectionTitleStyle}>PENJUALAN & DISTRIBUSI</div>
+        <Link to="/sales-orders" style={linkStyle('/sales-orders')}>📈 <span>Sales Orders</span></Link>
+        <Link to="/delivery" style={linkStyle('/delivery')}>🚚 <span>Delivery Management</span></Link>
+        <Link to="/returns" style={linkStyle('/returns')}>🔄 <span>Returns Management</span></Link>
+      </div>
+
+      {/* User Profile Footer */}
+      <div style={{ marginTop: '20px', paddingTop: '15px', borderTop: '1px solid #1e293b', display: 'flex', alignItems: 'center', gap: '12px', minWidth: '220px', fontFamily: 'sans-serif' }}>
+        <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#059669', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '15px' }}>
+          A
+        </div>
+        <div>
+          <div style={{ color: '#f8fafc', fontWeight: 'bold', fontSize: '14px' }}>Agus</div>
+          <div style={{ color: '#10b981', fontSize: '11px', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <span style={{ fontSize: '8px' }}>●</span> Production Active
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#94a3b8', fontSize: '20px', cursor: 'pointer', padding: '4px' }}>✕</button>
         </div>
-
-        <div style={{ padding: '20px', flex: 1 }}>
-          {/* UTAMA */}
-          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Utama</p>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', backgroundColor: '#2563eb', color: '#ffffff', borderRadius: '8px', textDecoration: 'none', marginBottom: '18px', fontWeight: '500', fontSize: '14px' }}>
-            <span>📊</span> Overview
-          </a>
-          
-          {/* OPERASIONAL & BISNIS */}
-          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Operasional & Bisnis</p>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>👥</span> Hotel & Customers</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>🐟</span> Supplier & Nelayan</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>📦</span> Fish Catalog</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '18px', borderRadius: '6px', fontSize: '13px' }}><span>📄</span> Quotation</a>
-
-          {/* RANTAI PASOK & GUDANG */}
-          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Rantai Pasok & Gudang</p>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>🛒</span> Purchase Orders</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>📥</span> Procurement</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>🛡️</span> Quality Control</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '18px', borderRadius: '6px', fontSize: '13px' }}><span>🧊</span> Inventory (Cold Storage)</a>
-
-          {/* PENJUALAN & DISTRIBUSI */}
-          <p style={{ fontSize: '10px', fontWeight: 'bold', color: '#64748b', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '8px' }}>Penjualan & Distribusi</p>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>📈</span> Sales Orders</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '4px', borderRadius: '6px', fontSize: '13px' }}><span>🚚</span> Delivery Management</a>
-          <a href="#" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '8px 12px', color: '#cbd5e1', textDecoration: 'none', marginBottom: '10px', borderRadius: '6px', fontSize: '13px' }}><span>↩️</span> Returns Management</a>
-        </div>
-
-        <div style={{ padding: '15px 20px', borderTop: '1px solid #1e293b', backgroundColor: '#020617', display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#fff', fontSize: '14px' }}>A</div>
-          <div>
-            <p style={{ fontSize: '14px', margin: 0, fontWeight: '500', color: '#fff' }}>Agus</p>
-            <p style={{ fontSize: '11px', color: '#34d399', margin: 0, fontWeight: '500' }}>● Production Active</p>
-          </div>
-        </div>
-      </aside>
-    </>
+      </div>
+    </aside>
   );
 }

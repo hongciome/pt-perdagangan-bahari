@@ -1,222 +1,187 @@
-import React, { useState } from 'react';
-import { ShoppingCart, ArrowLeft, TrendingUp, DollarSign, CheckCircle, Calculator, PieChart, Activity, X, FileText, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { useState } from 'react';
 
-const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
+export default function SalesOrder() {
+  const [salesOrders, setSalesOrders] = useState([
+    { id: 'SO-202611-045', client: 'Hotel Tentrem', date: '2026-11-04', items: 'Kerapu Macan (50kg)', total: 5750000, status: 'DELIVERED' },
+    { id: 'SO-202611-046', client: 'Gumaya Tower Hotel', date: '2026-11-04', items: 'Kakap Merah (30kg)', total: 2550000, status: 'PROCESSING' },
+    { id: 'SO-202611-047', client: 'Awann Sewu Boutique', date: '2026-11-03', items: 'Udang Vaname (20kg)', total: 1900000, status: 'COMPLETED' },
+  ]);
 
-export default function SalesOrder({ onBack }) {
-  const [selectedSO, setSelectedSO] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [newSO, setNewSO] = useState({ client: '', items: '', total: 0 });
 
-  // Simulasi Data Sales Orders
-  const salesOrders = [
-    { id: 'SO-202611-045', customer: 'Hotel Tentrem', date: '2026-11-04', items: 'Kerapu Macan (50kg)', totalRevenue: 5750000, status: 'DELIVERED' },
-    { id: 'SO-202611-046', customer: 'Gumaya Tower Hotel', date: '2026-11-04', items: 'Kakap Merah (30kg)', totalRevenue: 2550000, status: 'PROCESSING' },
-    { id: 'SO-202611-047', customer: 'Awann Sewu Boutique', date: '2026-11-03', items: 'Udang Vaname (20kg)', totalRevenue: 1900000, status: 'COMPLETED' },
-  ];
+  const handleAddSO = (e) => {
+    e.preventDefault();
+    if (!newSO.client || !newSO.items) return;
 
-  // Simulasi Database Profitability Engine (Backend Response)
-  const profitabilityData = {
-    'SO-202611-045': {
-      revenue: 5750000,
-      hppDasar: 4250000, // Harga beli bahan baku dari Nelayan (FIFO)
-      costs: {
-        transport: 150000,
-        iceStorage: 50000,
-        packaging: 45000,
-        shrinkage: 105000 // Susut timbangan 1.5kg
+    const nextId = `SO-202611-0${String(salesOrders.length + 48).padStart(2, '0')}`;
+    const today = new Date().toISOString().split('T')[0];
+
+    setSalesOrders([
+      ...salesOrders,
+      {
+        id: nextId,
+        ...newSO,
+        total: Number(newSO.total) || 0,
+        date: today,
+        status: 'PROCESSING'
       }
-    },
-    'SO-202611-046': {
-      revenue: 2550000,
-      hppDasar: 1800000,
-      costs: {
-        transport: 100000,
-        iceStorage: 30000,
-        packaging: 25000,
-        shrinkage: 0
-      }
-    },
-    'SO-202611-047': {
-      revenue: 1900000,
-      hppDasar: 1400000,
-      costs: {
-        transport: 75000,
-        iceStorage: 20000,
-        packaging: 25000,
-        shrinkage: 40000
-      }
-    }
+    ]);
+    setNewSO({ client: '', items: '', total: 0 });
+    setShowModal(false);
   };
 
-  const handleCalculateProfit = (so) => {
-    setSelectedSO({ 
-      info: so, 
-      metrics: profitabilityData[so.id] 
-    });
+  const handleCalculateMargin = (order) => {
+    const estHpp = order.total * 0.7; // Estimasi HPP 70%
+    const estMargin = order.total - estHpp;
+    alert(`PROFITABILITY ENGINE - ${order.id}\n==============================\nKlien: ${order.client}\nTotal Omzet: Rp ${order.total.toLocaleString('id-ID')}\nEst. HPP (Cost): Rp ${estHpp.toLocaleString('id-ID')}\nEst. Gross Profit (30%): Rp ${estMargin.toLocaleString('id-ID')}`);
   };
+
+  const totalOmzet = salesOrders.reduce((acc, curr) => acc + Number(curr.total), 0);
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto relative">
-      <div className="flex justify-between items-end border-b border-[#E5EAF0] pb-4">
+    <div style={{ padding: '30px', width: '100%', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
+      {/* Header Halaman */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <button onClick={onBack} className="text-xs font-semibold text-[#2457A6] hover:underline mb-1 flex items-center gap-1 cursor-pointer">
-            <ArrowLeft size={14} /> Kembali ke Dashboard
-          </button>
-          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <ShoppingCart size={24} className="text-[#2457A6]" /> SALES ORDERS (SO)
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">Kelola pesanan pelanggan dan analisis margin keuntungan per transaksi.</p>
+          <h2 style={{ margin: 0, color: '#1e293b' }}>🛒 SALES ORDERS (SO)</h2>
+          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>
+            Kelola pesanan pelanggan dan analisis margin keuntungan per transaksi.
+          </p>
         </div>
+        <button 
+          onClick={() => setShowModal(true)}
+          style={{ padding: '10px 18px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+          + Buat Sales Order Baru
+        </button>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#E5EAF0] shadow-2xs overflow-hidden">
-        <div className="p-4 bg-slate-50 border-b border-[#E5EAF0] flex items-center justify-between">
-          <h3 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
-            <FileText size={16} className="text-[#168C85]" /> Daftar Pesanan Aktif
+      {/* Ringkasan Statistik */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '25px' }}>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Total Transaksi Sales Order</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#0f172a' }}>{salesOrders.length} Order</h3>
+        </div>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Total Nilai Pesanan (Omzet)</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#16a34a' }}>
+            Rp {totalOmzet.toLocaleString('id-ID')}
           </h3>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-100/70 text-slate-600 border-b border-[#E5EAF0]">
-                <th className="p-3 font-bold">No. SO & Pelanggan</th>
-                <th className="p-3 font-bold">Tanggal</th>
-                <th className="p-3 font-bold">Rincian Item</th>
-                <th className="p-3 font-bold text-right">Nilai Pesanan (Omzet)</th>
-                <th className="p-3 font-bold text-center">Status</th>
-                <th className="p-3 font-bold text-center">Profitability Engine</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {salesOrders.map((so) => (
-                <tr key={so.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-3">
-                    <p className="font-bold text-[#2457A6]">{so.id}</p>
-                    <p className="font-semibold text-slate-900">{so.customer}</p>
-                  </td>
-                  <td className="p-3 font-semibold text-slate-700">{so.date}</td>
-                  <td className="p-3 text-slate-600">{so.items}</td>
-                  <td className="p-3 text-right font-extrabold text-slate-900">{formatRupiah(so.totalRevenue)}</td>
-                  <td className="p-3 text-center">
-                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
-                      <CheckCircle size={12} /> {so.status}
-                    </span>
-                  </td>
-                  <td className="p-3 text-center">
-                    <button 
-                      onClick={() => handleCalculateProfit(so)}
-                      className="bg-slate-800 hover:bg-[#2457A6] text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <Calculator size={14} /> Hitung Margin
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Pesanan Dalam Proses</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#d97706' }}>
+            {salesOrders.filter(s => s.status === 'PROCESSING').length} Order
+          </h3>
         </div>
       </div>
 
-      {/* OVERLAY: ORDER PROFITABILITY ENGINE */}
-      {selectedSO && (() => {
-        const { metrics, info } = selectedSO;
-        const totalOpsCost = metrics.costs.transport + metrics.costs.iceStorage + metrics.costs.packaging + metrics.costs.shrinkage;
-        const grossProfit = metrics.revenue - metrics.hppDasar;
-        const netProfit = grossProfit - totalOpsCost;
-        const marginPercent = ((netProfit / metrics.revenue) * 100).toFixed(1);
+      {/* Tabel Data Sales Order */}
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+        <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', fontWeight: 'bold', color: '#0f172a', fontSize: '15px' }}>
+          📄 Daftar Pesanan Aktif
+        </div>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
+          <thead>
+            <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+              <th style={{ padding: '12px 16px' }}>No. SO & Pelanggan</th>
+              <th style={{ padding: '12px 16px' }}>Tanggal</th>
+              <th style={{ padding: '12px 16px' }}>Rincian Item</th>
+              <th style={{ padding: '12px 16px' }}>Nilai Pesanan (Omzet)</th>
+              <th style={{ padding: '12px 16px', textAlign: 'center' }}>Status</th>
+              <th style={{ padding: '12px 16px', textAlign: 'center' }}>Profitability Engine</th>
+            </tr>
+          </thead>
+          <tbody>
+            {salesOrders.map((item) => (
+              <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                <td style={{ padding: '14px 16px' }}>
+                  <div style={{ fontWeight: 'bold', color: '#2563eb' }}>{item.id}</div>
+                  <div style={{ color: '#1e293b', fontWeight: 'bold', marginTop: '2px' }}>{item.client}</div>
+                </td>
+                <td style={{ padding: '14px 16px', color: '#64748b' }}>{item.date}</td>
+                <td style={{ padding: '14px 16px', color: '#475569' }}>{item.items}</td>
+                <td style={{ padding: '14px 16px', fontWeight: 'bold', color: '#0f172a' }}>
+                  Rp {item.total.toLocaleString('id-ID')}
+                </td>
+                <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                  <span style={{ 
+                    padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
+                    backgroundColor: item.status === 'COMPLETED' || item.status === 'DELIVERED' ? '#dcfce7' : '#e0f2fe',
+                    color: item.status === 'COMPLETED' || item.status === 'DELIVERED' ? '#15803d' : '#0369a1'
+                  }}>
+                    ✔ {item.status}
+                  </span>
+                </td>
+                <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                  <button 
+                    onClick={() => handleCalculateMargin(item)}
+                    style={{ padding: '6px 12px', backgroundColor: '#f1f5f9', color: '#334155', border: '1px solid #cbd5e1', borderRadius: '4px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>
+                    🧮 Hitung Margin
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
-        return (
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl border border-[#E5EAF0] max-w-2xl w-full overflow-hidden animate-in fade-in zoom-in duration-200 flex flex-col max-h-[90vh]">
-              
-              {/* Header Modal */}
-              <div className="bg-[#14263D] p-5 flex justify-between items-center text-white">
-                <div className="flex items-center gap-3">
-                  <div className="bg-[#2457A6] p-2 rounded-lg">
-                    <Activity size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-extrabold tracking-wide uppercase">Order Profitability Engine</h3>
-                    <p className="text-[11px] text-slate-400">Analisis Margin Khusus untuk {info.id}</p>
-                  </div>
-                </div>
-                <button onClick={() => setSelectedSO(null)} className="p-1.5 bg-slate-800 hover:bg-rose-600 rounded-lg transition-colors cursor-pointer">
-                  <X size={18} />
+      {/* Modal Form Tambah SO */}
+      {showModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '8px', width: '420px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, color: '#0f172a' }}>Buat Sales Order Baru</h3>
+            <form onSubmit={handleAddSO}>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Nama Pelanggan / Hotel</label>
+                <input 
+                  type="text" 
+                  required 
+                  value={newSO.client} 
+                  onChange={(e) => setNewSO({...newSO, client: e.target.value})}
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} 
+                  placeholder="Contoh: Awann Sewu Boutique"
+                />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Rincian Item & Volume</label>
+                <input 
+                  type="text" 
+                  required
+                  value={newSO.items} 
+                  onChange={(e) => setNewSO({...newSO, items: e.target.value})}
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} 
+                  placeholder="Contoh: Kerapu Macan (50kg)"
+                />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Nilai Pesanan Omzet (Rp)</label>
+                <input 
+                  type="number" 
+                  required
+                  value={newSO.total} 
+                  onChange={(e) => setNewSO({...newSO, total: e.target.value})}
+                  style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} 
+                  placeholder="5750000"
+                />
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button 
+                  type="button" 
+                  onClick={() => setShowModal(false)}
+                  style={{ padding: '8px 14px', backgroundColor: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
+                  Batal
+                </button>
+                <button 
+                  type="submit" 
+                  style={{ padding: '8px 14px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+                  Simpan Sales Order
                 </button>
               </div>
-
-              {/* Body Modal */}
-              <div className="p-6 overflow-y-auto bg-[#F5F7FA] space-y-6">
-                
-                {/* Info Klien */}
-                <div className="flex justify-between items-end">
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Klien</p>
-                    <p className="text-lg font-extrabold text-slate-900">{info.customer}</p>
-                    <p className="text-xs font-semibold text-slate-600">{info.items}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[10px] font-bold text-slate-500 uppercase">Nilai Faktur (Revenue)</p>
-                    <p className="text-2xl font-black text-[#2457A6]">{formatRupiah(metrics.revenue)}</p>
-                  </div>
-                </div>
-
-                {/* Breakdown Costs */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {/* HPP Dasar */}
-                  <div className="bg-white p-4 rounded-xl border border-rose-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-rose-500 uppercase flex items-center gap-1 mb-2">
-                      <ArrowDownRight size={14}/> HPP Pokok (Biaya Ikan)
-                    </p>
-                    <p className="text-lg font-extrabold text-rose-700">-{formatRupiah(metrics.hppDasar)}</p>
-                    <p className="text-[10px] text-slate-500 mt-1">Sistem ditarik otomatis via FIFO</p>
-                  </div>
-
-                  {/* Operasional */}
-                  <div className="bg-white p-4 rounded-xl border border-amber-100 shadow-sm">
-                    <p className="text-[10px] font-bold text-amber-600 uppercase flex items-center gap-1 mb-2">
-                      <ArrowDownRight size={14}/> Total Biaya Operasional & Susut
-                    </p>
-                    <p className="text-lg font-extrabold text-amber-700">-{formatRupiah(totalOpsCost)}</p>
-                    <div className="mt-2 space-y-1 text-[10px] font-medium text-slate-600 border-t border-slate-100 pt-2">
-                      <div className="flex justify-between"><span>Ongkos Kirim/Transport</span><span>{formatRupiah(metrics.costs.transport)}</span></div>
-                      <div className="flex justify-between"><span>Es & Cold Storage Allocation</span><span>{formatRupiah(metrics.costs.iceStorage)}</span></div>
-                      <div className="flex justify-between"><span>Packaging / Styrofoam</span><span>{formatRupiah(metrics.costs.packaging)}</span></div>
-                      <div className="flex justify-between text-rose-600 font-bold"><span>Susut Timbangan (Shrinkage)</span><span>{formatRupiah(metrics.costs.shrinkage)}</span></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Final Profit Calculation */}
-                <div className="bg-emerald-50 p-5 rounded-xl border border-emerald-200 shadow-sm relative overflow-hidden">
-                  <div className="absolute -right-4 -bottom-4 opacity-10">
-                    <TrendingUp size={100} className="text-emerald-500" />
-                  </div>
-                  <div className="relative z-10 flex justify-between items-center">
-                    <div>
-                      <p className="text-xs font-extrabold text-emerald-800 uppercase flex items-center gap-2 mb-1">
-                        <CheckCircle size={16} /> Keuntungan Bersih (Net Margin)
-                      </p>
-                      <p className="text-3xl font-black text-emerald-600">{formatRupiah(netProfit)}</p>
-                      <p className="text-xs font-semibold text-emerald-700/80 mt-1">Setelah dipotong seluruh HPP dan biaya operasional</p>
-                    </div>
-                    <div className="text-center bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-                      <p className="text-[10px] font-bold text-slate-500 uppercase">Margin %</p>
-                      <p className="text-2xl font-black text-emerald-600">{marginPercent}%</p>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-              <div className="bg-white p-4 border-t border-[#E5EAF0] text-right">
-                <button onClick={() => setSelectedSO(null)} className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-2.5 rounded-lg text-xs font-bold cursor-pointer">
-                  Tutup Analisis
-                </button>
-              </div>
-            </div>
+            </form>
           </div>
-        );
-      })()}
-
+        </div>
+      )}
     </div>
   );
 }

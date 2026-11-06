@@ -1,115 +1,142 @@
-import React, { useState } from 'react';
-import { ShieldCheck, ArrowLeft, CheckCircle2, AlertTriangle, Thermometer, FileText, Package } from 'lucide-react';
+import { useState } from 'react';
 
-const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
-
-export default function QualityControlPage({ onBack }) {
-  const [qcList, setQcList] = useState([
-    { id: 'QC-001', supplier: 'Nelayan Jepara', item: 'Kerapu Macan', declaredQty: '150 kg', temp: '-2.5°C', status: 'PENDING', date: 'Hari ini, 06:30' },
-    { id: 'QC-002', supplier: 'TPI Tambak Lorok', item: 'Kakap Merah', declaredQty: '100 kg', temp: '-1.8°C', status: 'APPROVED', date: 'Kemarin' },
-    { id: 'QC-003', supplier: 'Tambak Kendal', item: 'Udang Vaname', declaredQty: '80 kg', temp: '-15°C', status: 'APPROVED', date: '2 Nov 2026' },
+export default function QualityControlPage() {
+  const [inspections, setInspections] = useState([
+    { id: '#QC-202611-001', batch: 'BTCH-KM02-01', supplier: 'Pak Kasan (KM Bahari 02)', commodity: 'Ikan Kakap Merah Segar', temp: -1.5, score: '9.2 / 10', inspector: 'Sigit Prakoso', status: 'Lolos QC (Grade A)' },
+    { id: '#QC-202611-002', batch: 'BTCH-UDLJ-04', supplier: 'H. Slamet (UD Laut Jaya)', commodity: 'Cumi-cumi Sero', temp: 0.2, score: '8.5 / 10', inspector: 'Sigit Prakoso', status: 'Lolos QC (Grade A)' },
+    { id: '#QC-202611-003', batch: 'BTCH-PKL-02', supplier: 'Armada Pekalongan', commodity: 'Udang Vaname', temp: 3.5, score: '6.8 / 10', inspector: 'Sigit Prakoso', status: 'Downgrade (Grade B)' },
   ]);
 
-  const handleApproveQC = (id) => {
-    setQcList(qcList.map(item => item.id === id ? { ...item, status: 'APPROVED' } : item));
-    alert(`QC Berhasil Diverifikasi! Muatan ${id} disetujui masuk ke Cold Storage.`);
-  };
+  const [showModal, setShowModal] = useState(false);
+  const [newQC, setNewQC] = useState({ batch: '', supplier: '', commodity: '', temp: 0, score: '9.0', status: 'Lolos QC (Grade A)' });
 
-  const handleRejectQC = (id) => {
-    const reason = prompt("Masukkan alasan penolakan/catatan penurunan grade:");
-    if (!reason) return;
-    setQcList(qcList.map(item => item.id === id ? { ...item, status: 'REJECTED' } : item));
-    alert(`Muatan ${id} ditolak/diretur ke supplier dengan alasan: ${reason}`);
+  const handleAddQC = (e) => {
+    e.preventDefault();
+    if (!newQC.batch || !newQC.supplier) return;
+    const nextId = `#QC-202611-0${String(inspections.length + 1).padStart(2, '0')}`;
+    setInspections([
+      ...inspections,
+      {
+        id: nextId,
+        ...newQC,
+        temp: Number(newQC.temp),
+        score: `${newQC.score} / 10`,
+        inspector: 'Sigit Prakoso'
+      }
+    ]);
+    setNewQC({ batch: '', supplier: '', commodity: '', temp: 0, score: '9.0', status: 'Lolos QC (Grade A)' });
+    setShowModal(false);
   };
 
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto relative">
-      <div className="flex justify-between items-end border-b border-[#E5EAF0] pb-4">
+    <div style={{ padding: '30px', width: '100%', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <div>
-          <button onClick={onBack} className="text-xs font-semibold text-[#2457A6] hover:underline mb-1 flex items-center gap-1 cursor-pointer">
-            <ArrowLeft size={14} /> Kembali ke Dashboard
-          </button>
-          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <ShieldCheck size={24} className="text-[#168C85]" /> QUALITY CONTROL (QC) & COLD CHAIN
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">Verifikasi suhu muatan, kelayakan fisik, dan validasi timbangan kedatangan dari supplier/nelayan.</p>
+          <h2 style={{ margin: 0, color: '#1e293b' }}>Inspeksi Mutu & Quality Control (QC)</h2>
+          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>Pengujian suhu palka/es, organoleptik mata & insang saat pembongkaran ikan dari nelayan.</p>
+        </div>
+        <button 
+          onClick={() => setShowModal(true)}
+          style={{ padding: '10px 18px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
+          + Input Inspeksi QC
+        </button>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginBottom: '25px' }}>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Total Inspeksi Pembongkaran</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#0f172a' }}>{inspections.length} Batch</h3>
+        </div>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Tingkat Kelulusan Grade A</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#16a34a' }}>
+            {Math.round((inspections.filter(i => i.status.includes('Grade A')).length / inspections.length) * 100)}%
+          </h3>
+        </div>
+        <div style={{ backgroundColor: 'white', padding: '20px', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <span style={{ fontSize: '13px', color: '#64748b' }}>Rata-rata Suhu Palka / Es</span>
+          <h3 style={{ margin: '8px 0 0 0', fontSize: '24px', color: '#0369a1' }}>
+            {(inspections.reduce((a, b) => a + b.temp, 0) / inspections.length).toFixed(1)} °C
+          </h3>
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-[#E5EAF0] shadow-2xs overflow-hidden">
-        <div className="p-4 bg-slate-50 border-b border-[#E5EAF0] flex justify-between items-center">
-          <h3 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
-            <Package size={16} className="text-[#168C85]" /> Antrean Verifikasi Muatan Masuk
-          </h3>
-          <span className="text-[10px] bg-teal-50 text-teal-700 font-bold px-2.5 py-1 rounded">Standar Suhu: &lt; -2°C</span>
-        </div>
-        <table className="w-full text-left border-collapse text-xs">
+      <div style={{ backgroundColor: 'white', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
           <thead>
-            <tr className="bg-slate-100/70 text-slate-600 border-b border-[#E5EAF0]">
-              <th className="p-3 font-bold">ID QC & Supplier</th>
-              <th className="p-3 font-bold">Jenis Ikan & Berat</th>
-              <th className="p-3 font-bold text-center">Suhu Muatan (Cold Chain)</th>
-              <th className="p-3 font-bold text-center">Status Verifikasi</th>
-              <th className="p-3 font-bold text-center">Aksi QC</th>
+            <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#475569' }}>
+              <th style={{ padding: '12px 16px' }}>No. Laporan QC</th>
+              <th style={{ padding: '12px 16px' }}>Kode Batch Pasokan</th>
+              <th style={{ padding: '12px 16px' }}>Supplier Nelayan</th>
+              <th style={{ padding: '12px 16px' }}>Komoditas</th>
+              <th style={{ padding: '12px 16px' }}>Suhu (°C)</th>
+              <th style={{ padding: '12px 16px' }}>Skor Kesegaran</th>
+              <th style={{ padding: '12px 16px' }}>Inspektor</th>
+              <th style={{ padding: '12px 16px', textAlign: 'center' }}>Hasil QC</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100">
-            {qcList.map((qc) => (
-              <tr key={qc.id} className="hover:bg-slate-50 transition-colors">
-                <td className="p-3">
-                  <p className="font-bold text-[#2457A6]">{qc.id}</p>
-                  <p className="font-semibold text-slate-900">{qc.supplier}</p>
-                  <span className="text-[9px] text-slate-400">{qc.date}</span>
-                </td>
-                <td className="p-3">
-                  <p className="font-bold text-slate-800">{qc.item}</p>
-                  <p className="text-[11px] text-slate-500">Deklarasi: {qc.declaredQty}</p>
-                </td>
-                <td className="p-3 text-center">
-                  <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 text-blue-700 rounded-lg font-bold text-xs">
-                    <Thermometer size={14} className="text-[#168C85]" /> {qc.temp}
+          <tbody>
+            {inspections.map((item) => (
+              <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                <td style={{ padding: '14px 16px', fontWeight: 'bold', color: '#2563eb' }}>{item.id}</td>
+                <td style={{ padding: '14px 16px', fontWeight: 'bold', color: '#1e293b' }}>{item.batch}</td>
+                <td style={{ padding: '14px 16px', color: '#475569' }}>{item.supplier}</td>
+                <td style={{ padding: '14px 16px', color: '#475569' }}>{item.commodity}</td>
+                <td style={{ padding: '14px 16px', fontWeight: 'bold', color: item.temp <= 2 ? '#0284c7' : '#dc2626' }}>{item.temp} °C</td>
+                <td style={{ padding: '14px 16px', fontWeight: 'bold', color: '#0f172a' }}>{item.score}</td>
+                <td style={{ padding: '14px 16px', color: '#64748b' }}>{item.inspector}</td>
+                <td style={{ padding: '14px 16px', textAlign: 'center' }}>
+                  <span style={{ 
+                    padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
+                    backgroundColor: item.status.includes('Grade A') ? '#dcfce7' : '#fef3c7',
+                    color: item.status.includes('Grade A') ? '#15803d' : '#b45309'
+                  }}>
+                    {item.status}
                   </span>
-                </td>
-                <td className="p-3 text-center">
-                  {qc.status === 'APPROVED' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
-                      <CheckCircle2 size={12} /> LOLOS QC
-                    </span>
-                  ) : qc.status === 'REJECTED' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 rounded-full font-bold text-[10px]">
-                      <AlertTriangle size={12} /> DITOLAK / RETUR
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-100 text-amber-800 rounded-full font-bold text-[10px]">
-                      MENUNGGU CEK
-                    </span>
-                  )}
-                </td>
-                <td className="p-3 text-center">
-                  {qc.status === 'PENDING' ? (
-                    <div className="flex justify-center gap-1.5">
-                      <button 
-                        onClick={() => handleApproveQC(qc.id)}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer"
-                      >
-                        Setujui
-                      </button>
-                      <button 
-                        onClick={() => handleRejectQC(qc.id)}
-                        className="bg-rose-600 hover:bg-rose-700 text-white px-2.5 py-1 rounded text-[11px] font-bold cursor-pointer"
-                      >
-                        Tolak
-                      </button>
-                    </div>
-                  ) : (
-                    <span className="text-[11px] text-slate-400 italic">Selesai</span>
-                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {showModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ backgroundColor: 'white', padding: '25px', borderRadius: '8px', width: '420px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)' }}>
+            <h3 style={{ marginTop: 0, color: '#0f172a' }}>Input Inspeksi QC Baru</h3>
+            <form onSubmit={handleAddQC}>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Kode Batch Pasokan</label>
+                <input type="text" required value={newQC.batch} onChange={(e) => setNewQC({...newQC, batch: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} placeholder="BTCH-KM02-05" />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Supplier / Armada Nelayan</label>
+                <input type="text" required value={newQC.supplier} onChange={(e) => setNewQC({...newQC, supplier: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} placeholder="Pak Kasan (KM Bahari 02)" />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Komoditas Ikan</label>
+                <input type="text" required value={newQC.commodity} onChange={(e) => setNewQC({...newQC, commodity: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} placeholder="Ikan Kakap Merah Segar" />
+              </div>
+              <div style={{ marginBottom: '12px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Suhu Palka (°C)</label>
+                <input type="number" step="0.1" required value={newQC.temp} onChange={(e) => setNewQC({...newQC, temp: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }} placeholder="-1.5" />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#475569', marginBottom: '4px' }}>Keputusan QC</label>
+                <select value={newQC.status} onChange={(e) => setNewQC({...newQC, status: e.target.value})} style={{ width: '100%', padding: '8px', borderRadius: '4px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}>
+                  <option value="Lolos QC (Grade A)">Lolos QC (Grade A)</option>
+                  <option value="Downgrade (Grade B)">Downgrade (Grade B)</option>
+                  <option value="Tolak / Reject">Tolak / Reject</option>
+                </select>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+                <button type="button" onClick={() => setShowModal(false)} style={{ padding: '8px 14px', backgroundColor: '#e2e8f0', color: '#475569', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Batal</button>
+                <button type="submit" style={{ padding: '8px 14px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Simpan QC</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
