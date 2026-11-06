@@ -1,121 +1,190 @@
-import React, { useEffect, useState } from 'react';
-import { CreditCard, ArrowLeft, CheckCircle, MessageSquare, AlertCircle, Clock, FileText } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { supabase } from '../supabase';
 
-const formatRupiah = (num) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(num || 0);
-
-export default function Invoices({ onBack }) {
+export default function Invoices() {
   const [invoices, setInvoices] = useState([]);
+  const [form, setForm] = useState({ invoice_number: '', client_id: '', total_amount: '', due_date: '', payment_status: 'Belum Lunas' });
+  const [loading, setLoading] = useState(true);
 
+  // Ambil data dari tabel 'invoices' Supabase saat halaman dibuka
   useEffect(() => {
-    // Mencoba mengambil data dari backend, jika gagal atau kosong, gunakan data simulasi
-    fetch('/api/invoices')
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0) {
-          setInvoices(data);
-        } else {
-          throw new Error("Gunakan data simulasi");
-        }
-      })
-      .catch(() => {
-        // DATA SIMULASI PIUTANG YANG BENAR
-        setInvoices([
-          { id: 'INV-202611-045', customer: 'Hotel Tentrem', date: '2026-11-04', dueDate: '2026-11-18', totalAmount: 5750000, status: 'UNPAID' },
-          { id: 'INV-202611-046', customer: 'Gumaya Tower Hotel', date: '2026-11-04', dueDate: '2026-11-18', totalAmount: 2550000, status: 'PAID' },
-          { id: 'INV-202611-047', customer: 'Awann Sewu Boutique', date: '2026-11-03', dueDate: '2026-11-17', totalAmount: 1900000, status: 'UNPAID' },
-        ]);
-      });
+    fetchInvoices();
   }, []);
 
-  const handleSendWhatsApp = (inv) => {
-    const phone = prompt(`Masukkan nomor WhatsApp PIC / Keuangan ${inv.customer} (contoh: 08123456789):`, "08");
-    if (!phone) return;
+  async function fetchInvoices() {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.from('invoices').select('*');
+      if (error) throw error;
+      if (data) setInvoices(data);
+    } catch (error) {
+      console.error('Gagal memuat invoices:', error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
 
-    const message = `Halo Tim Keuangan ${inv.customer},\n\nBerikut adalah pengingat tagihan (Invoice) dari PT Bahari Koh Ahong (SEAFOOD OS):\n\nNo. Invoice: ${inv.id}\nTanggal Terbit: ${inv.date}\nTotal Tagihan: ${formatRupiah(inv.totalAmount)}\nStatus: ${inv.status}\nJatuh Tempo: ${inv.dueDate}\n\nMohon bantuan untuk memproses pelunasan sebelum tanggal jatuh tempo. Terima kasih atas kerja sama yang baik.`;
-    
-    // Membuka WhatsApp Web / API langsung secara instan
-    const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/${phone.replace(/^0/, '62')}?text=${encodedMessage}`, '_blank');
+  // Tambah faktur baru ke Supabase
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!form.invoice_number || !form.client_id || !form.total_amount || !form.due_date) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('invoices')
+        .insert([
+          { 
+            invoice_number: form.invoice_number, 
+            client_id: Number(form.client_id), 
+            total_amount: Number(form.total_amount), 
+            due_date: form.due_date,
+            payment_status: form.payment_status 
+          }
+        ])
+        .select();
+
+      if (error) throw error;
+
+      if (data) {
+        setInvoices([...invoices, data[0]]);
+        setForm({ invoice_number: '', client_id: '', total_amount: '', due_date: '', payment_status: 'Belum Lunas' });
+      }
+    } catch (error) {
+      console.error('Gagal menambah faktur:', error.message);
+      alert('Gagal menyimpan faktur ke database Supabase.');
+    }
   };
 
-  const totalPiutang = invoices.filter(i => i.status === 'UNPAID').reduce((sum, i) => sum + i.totalAmount, 0);
-
   return (
-    <div className="p-6 space-y-6 max-w-6xl mx-auto relative">
-      <div className="flex justify-between items-end border-b border-[#E5EAF0] pb-4">
-        <div>
-          <button onClick={onBack} className="text-xs font-semibold text-[#2457A6] hover:underline mb-1 flex items-center gap-1 cursor-pointer">
-            <ArrowLeft size={14} /> Kembali ke Dashboard
-          </button>
-          <h1 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
-            <CreditCard size={24} className="text-[#2457A6]" /> KEUANGAN & PIUTANG (AR)
-          </h1>
-          <p className="text-xs text-slate-500 mt-1">Kelola penagihan hotel dan pantau status pembayaran invoice Anda.</p>
+    <div style={{ width: '100%', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
+      
+      {/* Header Halaman */}
+      <div style={{ marginBottom: '25px' }}>
+        <h2 style={{ margin: 0, color: '#0f172a', fontSize: '26px' }}>Manajemen Faktur & Tagihan (Invoices)</h2>
+        <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>
+          Kontrol penagihan piutang dan tempo pembayaran klien hotel & restoran (Live Supabase).
+        </p>
+      </div>
+
+      {/* Form Tambah Faktur */}
+      <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', marginBottom: '30px' }}>
+        <h3 style={{ margin: '0 0 16px 0', fontSize: '16px', color: '#0f172a' }}>+ Buat Faktur Tagihan Baru</h3>
+        <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px', alignItems: 'end' }}>
+          
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>NO. FAKTUR</label>
+            <input 
+              type="text" 
+              placeholder="Cth: INV-2026-001" 
+              value={form.invoice_number} 
+              onChange={(e) => setForm({ ...form, invoice_number: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }} 
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>ID KLIEN (SUPABASE)</label>
+            <input 
+              type="number" 
+              placeholder="Cth: 1" 
+              value={form.client_id} 
+              onChange={(e) => setForm({ ...form, client_id: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }} 
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>TOTAL TAGIHAN (RP)</label>
+            <input 
+              type="number" 
+              placeholder="0" 
+              value={form.total_amount} 
+              onChange={(e) => setForm({ ...form, total_amount: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box' }} 
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>JATUH TEMPO</label>
+            <input 
+              type="date" 
+              value={form.due_date} 
+              onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box', backgroundColor: 'white' }} 
+            />
+          </div>
+
+          <div>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold', color: '#64748b', marginBottom: '6px' }}>STATUS PEMBAYARAN</label>
+            <select 
+              value={form.payment_status} 
+              onChange={(e) => setForm({ ...form, payment_status: e.target.value })}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', fontSize: '14px', boxSizing: 'border-box', backgroundColor: 'white' }}>
+              <option value="Belum Lunas">Belum Lunas</option>
+              <option value="Lunas">Lunas</option>
+              <option value="Jatuh Tempo">Jatuh Tempo</option>
+            </select>
+          </div>
+
+          <div>
+            <button type="submit" style={{ width: '100%', padding: '11px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px' }}>
+              Simpan Faktur
+            </button>
+          </div>
+
+        </form>
+      </div>
+
+      {/* Tabel Invoices */}
+      <div style={{ backgroundColor: 'white', borderRadius: '10px', boxShadow: '0 1px 3px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid #f1f5f9' }}>
+          <h3 style={{ margin: 0, color: '#0f172a', fontSize: '16px' }}>Daftar Faktur (Live Supabase)</h3>
         </div>
-        <div className="bg-rose-50 px-4 py-2 rounded-xl border border-rose-100 shadow-sm text-right">
-          <p className="text-[10px] font-bold text-rose-500 uppercase">Total Piutang Belum Lunas</p>
-          <p className="text-xl font-extrabold text-rose-700">{formatRupiah(totalPiutang)}</p>
+
+        <div style={{ overflowX: 'auto' }}>
+          {loading ? (
+            <div style={{ padding: '30px', textAlign: 'center', color: '#64748b' }}>Memuat data faktur...</div>
+          ) : (
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px', minWidth: '600px' }}>
+              <thead>
+                <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '12px' }}>
+                  <th style={{ padding: '14px 20px' }}>No. Faktur</th>
+                  <th style={{ padding: '14px 20px' }}>ID Klien</th>
+                  <th style={{ padding: '14px 20px' }}>Total Tagihan</th>
+                  <th style={{ padding: '14px 20px' }}>Jatuh Tempo</th>
+                  <th style={{ padding: '14px 20px' }}>Status Pembayaran</th>
+                </tr>
+              </thead>
+              <tbody>
+                {invoices.length === 0 ? (
+                  <tr>
+                    <td colSpan="5" style={{ padding: '20px', textAlign: 'center', color: '#64748b' }}>Belum ada data faktur di database.</td>
+                  </tr>
+                ) : (
+                  invoices.map((item, index) => (
+                    <tr key={item.id || index} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                      <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#2563eb' }}>{item.invoice_number}</td>
+                      <td style={{ padding: '16px 20px', color: '#1e293b' }}>Klien ID: {item.client_id}</td>
+                      <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#0f172a' }}>Rp {Number(item.total_amount).toLocaleString('id-ID')}</td>
+                      <td style={{ padding: '16px 20px', color: '#64748b' }}>{item.due_date}</td>
+                      <td style={{ padding: '16px 20px' }}>
+                        <span style={{ 
+                          padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
+                          backgroundColor: item.payment_status === 'Lunas' ? '#dcfce7' : item.payment_status === 'Jatuh Tempo' ? '#fee2e2' : '#fef08a',
+                          color: item.payment_status === 'Lunas' ? '#15803d' : item.payment_status === 'Jatuh Tempo' ? '#991b1b' : '#854d0e'
+                        }}>
+                          {item.payment_status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          )}
         </div>
       </div>
 
-      <div className="bg-white rounded-[10px] border border-[#E5EAF0] shadow-2xs overflow-hidden">
-        <div className="p-4 bg-slate-50 border-b border-[#E5EAF0] flex items-center justify-between">
-          <h3 className="text-xs font-bold text-slate-700 uppercase flex items-center gap-2">
-            <FileText size={16} className="text-[#168C85]" /> Daftar Tagihan Invoice B2B
-          </h3>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-100/70 text-slate-600 border-b border-[#E5EAF0]">
-                <th className="p-3 font-bold">No. Invoice & Klien</th>
-                <th className="p-3 font-bold">Tanggal & Jatuh Tempo</th>
-                <th className="p-3 font-bold text-right">Total Tagihan</th>
-                <th className="p-3 font-bold text-center">Status</th>
-                <th className="p-3 font-bold text-center">Aksi Penagihan</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {invoices.map((inv) => (
-                <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="p-3">
-                    <p className="font-bold text-[#2457A6]">{inv.id}</p>
-                    <p className="font-semibold text-slate-900">{inv.customer}</p>
-                  </td>
-                  <td className="p-3">
-                    <p className="font-semibold text-slate-700">{inv.date}</p>
-                    <p className="text-[10px] text-slate-500 font-bold mt-0.5 flex items-center gap-1">
-                      <Clock size={12}/> Tempo: {inv.dueDate}
-                    </p>
-                  </td>
-                  <td className="p-3 text-right font-extrabold text-slate-900">
-                    {formatRupiah(inv.totalAmount)}
-                  </td>
-                  <td className="p-3 text-center">
-                    {inv.status === 'PAID' ? (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
-                        <CheckCircle size={12} /> LUNAS
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-rose-100 text-rose-800 rounded-full font-bold text-[10px] animate-pulse">
-                        <AlertCircle size={12} /> BELUM LUNAS
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-3 text-center">
-                    <button 
-                      onClick={() => handleSendWhatsApp(inv)}
-                      className="bg-[#168C85] hover:bg-teal-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold inline-flex items-center gap-1 transition-colors cursor-pointer"
-                    >
-                      <MessageSquare size={14} /> Tagih via WA
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
     </div>
   );
 }
