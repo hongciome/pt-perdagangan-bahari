@@ -1,22 +1,16 @@
-const express = require('express');
-const helmet = require('helmet');
-const rateLimit = require('express-rate-limit');
-const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config();
+import express from 'express';
+import helmet from 'helmet';
+import { createClient } from '@supabase/supabase-js';
 
 const app = express();
-app.use(helmet());
 
-const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { success: false, message: 'Terlalu banyak percobaan dari IP ini, silakan coba lagi nanti.' }
-});
-app.use('/api/', apiLimiter);
+app.use(helmet());
 app.use(express.json());
 
-// Inisialisasi koneksi Supabase aman menggunakan .env
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Inisialisasi koneksi Supabase secara langsung agar tidak pusing dengan .env
+const supabaseUrl = 'https://jvapzokomhnnspwhmldl.supabase.co';
+const supabaseKey = 'MASUKKAN_ANON_KEY_KAMU_DISINI'; 
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Database akun resmi
 const usersDB = [
@@ -53,6 +47,7 @@ app.get('/api/transactions', async (req, res) => {
     const { data, error } = await supabase.from('transactions').select('*').order('created_at', { ascending: false });
     
     if (error) {
+      // Data dummy fallback jika tabel belum siap
       return res.status(200).json({
         success: true,
         data: [
@@ -93,7 +88,7 @@ app.post('/api/transactions', async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: 'Transaksi berhasil disimpan permanen ke database Supabase!',
+      message: 'Transaksi berhasil disimpan ke database Supabase!',
       data: newTransaction
     });
   } catch (err) {
@@ -101,7 +96,7 @@ app.post('/api/transactions', async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => {
-  console.log(`Backend SEAFOOD OS terhubung ke Supabase dan aktif di port ${PORT}`);
+  console.log(`✅ Backend SEAFOOD OS berhasil menyala di port ${PORT}`);
 });

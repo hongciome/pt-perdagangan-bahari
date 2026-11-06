@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import PDFDocument from 'pdfkit';
 import { PrismaClient } from '@prisma/client';
+import { supabase } from './supabaseClient.js';
 
 const prisma = new PrismaClient();
 const app = express();
@@ -51,6 +52,32 @@ app.get('/api/dashboard/metrics', async (req, res) => {
 app.get('/api/products', async (req, res) => res.json(await prisma.product.findMany({ orderBy: { name: 'asc' } })));
 app.get('/api/customers', async (req, res) => res.json(await prisma.customer.findMany({ orderBy: { name: 'asc' } })));
 app.get('/api/suppliers', async (req, res) => res.json(await prisma.supplier.findMany({ orderBy: { name: 'asc' } })));
+
+// --- CLIENTS API (SUPABASE DIRECT INTEGRATION) ---
+app.get('/api/clients', async (req, res) => {
+  try {
+    const { data, error } = await supabase.from('clients').select('*').order('id', { ascending: true });
+    if (error) throw error;
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/clients', async (req, res) => {
+  try {
+    const { client_name, address } = req.body;
+    const { data, error } = await supabase
+      .from('clients')
+      .insert([{ client_name, address }])
+      .select();
+
+    if (error) throw error;
+    res.status(201).json({ message: 'Klien berhasil ditambahkan!', data });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
 
 // --- PURCHASE ORDER & QC API ---
 app.get('/api/purchase/orders', async (req, res) => {
@@ -326,5 +353,5 @@ app.get('/api/sales/orders/:id/pdf/:type', async (req, res) => {
   }
 });
 
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`ERP Backend berjalan pada port ${PORT}`));
