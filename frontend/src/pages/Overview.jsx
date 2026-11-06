@@ -10,24 +10,25 @@ export default function Overview() {
   return (
     <div style={{ padding: '30px', width: '100%', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
       
-      {/* Top Bar / Owner Badge */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '15px' }}>
-        <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold' }}>
-          Sigit Prakoso <span style={{ color: '#2563eb', fontWeight: 'bold' }}>(Owner)</span>
-        </span>
-      </div>
-
-      {/* Header Dashboard */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+      {/* Header Dashboard & Owner Badge Sejajar di Atas */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '25px', flexWrap: 'wrap', gap: '15px' }}>
         <div>
           <h2 style={{ margin: 0, color: '#0f172a', fontSize: '26px' }}>Dashboard Overview</h2>
           <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>
             PT Perdagangan Bahari Koh Ahong - Pusat Komoditas Ikan Segar B2B.
           </p>
         </div>
-        <button style={{ padding: '10px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-          + Tambah Transaksi
-        </button>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Owner Badge */}
+          <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '8px 16px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #c7d2fe' }}>
+            Sigit Prakoso <span style={{ color: '#2563eb', fontWeight: 'bold' }}>(Owner)</span>
+          </span>
+
+          <button style={{ padding: '10px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            + Tambah Transaksi
+          </button>
+        </div>
       </div>
 
       {/* 4 Stat Cards */}
@@ -78,36 +79,38 @@ export default function Overview() {
           <span style={{ color: '#64748b', fontSize: '13px' }}>Total: {orders.length} Transaksi</span>
         </div>
 
-        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px' }}>
-          <thead>
-            <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '12px' }}>
-              <th style={{ padding: '14px 20px' }}>ID Pesanan</th>
-              <th style={{ padding: '14px 20px' }}>Klien / Hotel / Resto</th>
-              <th style={{ padding: '14px 20px' }}>Komoditas Ikan</th>
-              <th style={{ padding: '14px 20px' }}>Total (Rp)</th>
-              <th style={{ padding: '14px 20px' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((item) => (
-              <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#2563eb' }}>{item.id}</td>
-                <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#1e293b' }}>{item.client}</td>
-                <td style={{ padding: '16px 20px', color: '#64748b' }}>{item.items}</td>
-                <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#0f172a' }}>Rp {item.total.toLocaleString('id-ID')}</td>
-                <td style={{ padding: '16px 20px' }}>
-                  <span style={{ 
-                    padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
-                    backgroundColor: item.status === 'Selesai / Dikirim' ? '#dcfce7' : item.status === 'Proses Gudang' ? '#e0f2fe' : '#fef3c7',
-                    color: item.status === 'Selesai / Dikirim' ? '#15803d' : item.status === 'Proses Gudang' ? '#0369a1' : '#b45309'
-                  }}>
-                    {item.status}
-                  </span>
-                </td>
+        <div style={{ overflowX: 'auto' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '14px', minWidth: '600px' }}>
+            <thead>
+              <tr style={{ backgroundColor: '#f8fafc', borderBottom: '1px solid #e2e8f0', color: '#64748b', fontSize: '12px' }}>
+                <th style={{ padding: '14px 20px' }}>ID Pesanan</th>
+                <th style={{ padding: '14px 20px' }}>Klien / Hotel / Resto</th>
+                <th style={{ padding: '14px 20px' }}>Komoditas Ikan</th>
+                <th style={{ padding: '14px 20px' }}>Total (Rp)</th>
+                <th style={{ padding: '14px 20px' }}>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {orders.map((item) => (
+                <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                  <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#2563eb' }}>{item.id}</td>
+                  <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#1e293b' }}>{item.client}</td>
+                  <td style={{ padding: '16px 20px', color: '#64748b' }}>{item.items}</td>
+                  <td style={{ padding: '16px 20px', fontWeight: 'bold', color: '#0f172a' }}>Rp {item.total.toLocaleString('id-ID')}</td>
+                  <td style={{ padding: '16px 20px' }}>
+                    <span style={{ 
+                      padding: '4px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 'bold',
+                      backgroundColor: item.status === 'Selesai / Dikirim' ? '#dcfce7' : item.status === 'Proses Gudang' ? '#e0f2fe' : '#fef3c7',
+                      color: item.status === 'Selesai / Dikirim' ? '#15803d' : item.status === 'Proses Gudang' ? '#0369a1' : '#b45309'
+                    }}>
+                      {item.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
     </div>
