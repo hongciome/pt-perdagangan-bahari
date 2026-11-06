@@ -40,39 +40,55 @@ function MainContent({ sidebarOpen, setSidebarOpen }) {
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
       
       {/* Top Header Bar */}
-      <div style={{ padding: '16px 24px 8px 24px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
-        <button 
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          style={{ 
-            width: '36px', 
-            height: '36px', 
-            backgroundColor: '#ffffff', 
-            border: '1px solid #cbd5e1', 
-            borderRadius: '8px', 
-            cursor: 'pointer', 
-            display: 'inline-flex', 
-            alignItems: 'center', 
-            justifyContent: 'center', 
-            fontSize: '16px', 
-            color: '#1e293b',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-            flexShrink: 0
-          }}>
-          ≡
-        </button>
+      <div style={{ padding: '16px 30px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#ffffff', borderBottom: '1px solid #e2e8f0', width: '100%', boxSizing: 'border-box' }}>
+        
+        {/* Sisi Kiri */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button 
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{ 
+              width: '36px', 
+              height: '36px', 
+              backgroundColor: '#ffffff', 
+              border: '1px solid #cbd5e1', 
+              borderRadius: '8px', 
+              cursor: 'pointer', 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              justifyContent: 'center', 
+              fontSize: '16px', 
+              color: '#1e293b',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+              flexShrink: 0
+            }}>
+            ≡
+          </button>
 
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-          <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', fontFamily: 'Georgia, serif' }}>
-            SEAFOOD OS
-          </span>
-          <span style={{ fontSize: '15px', color: '#64748b', fontFamily: 'Georgia, serif' }}>
-            / {currentPage}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 'bold', color: '#0f172a', fontFamily: 'Georgia, serif' }}>
+              SEAFOOD OS
+            </span>
+            <span style={{ fontSize: '15px', color: '#64748b', fontFamily: 'Georgia, serif' }}>
+              / {currentPage}
+            </span>
+          </div>
         </div>
+
+        {/* Sisi Kanan: Mentok Rata Kanan */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #c7d2fe' }}>
+            Sigit Prakoso <span style={{ color: '#2563eb', fontWeight: 'bold' }}>(Owner)</span>
+          </span>
+
+          <button style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+            + Tambah Transaksi
+          </button>
+        </div>
+
       </div>
 
-      {/* Area Konten Utama */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
+      {/* Area Konten */}
+      <div style={{ flex: 1, overflowY: 'auto', padding: '30px' }}>
         <Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/customers" element={<Customers />} />
@@ -99,10 +115,8 @@ export default function App() {
 
   return (
     <Router>
-      {/* Pembungkus Utama Flexbox agar Sidebar dan Konten Sejajar Rapi */}
       <div style={{ display: 'flex', width: '100vw', height: '100vh', backgroundColor: '#f8fafc', overflow: 'hidden' }}>
         
-        {/* Kontainer Sidebar dengan Pengaturan Lebar Dinamis Berdasarkan State */}
         <div style={{ 
           width: sidebarOpen ? '260px' : '0px', 
           flexShrink: 0, 
