@@ -39,7 +39,7 @@ function MainContent({ sidebarOpen, setSidebarOpen }) {
   return (
     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
       
-      {/* Top Header Bar */}
+      {/* Top Header Bar - Hanya Tombol Menu, Judul, & Badge Owner di Pojok Kanan */}
       <div style={{ padding: '16px 30px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#ffffff', borderBottom: '1px solid #e2e8f0', width: '100%', boxSizing: 'border-box' }}>
         
         {/* Sisi Kiri */}
@@ -74,15 +74,11 @@ function MainContent({ sidebarOpen, setSidebarOpen }) {
           </div>
         </div>
 
-        {/* Sisi Kanan: Mentok Rata Kanan */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        {/* Sisi Kanan: Badge Owner Saja di Atas */}
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <span style={{ backgroundColor: '#e0e7ff', color: '#3730a3', padding: '6px 14px', borderRadius: '20px', fontSize: '13px', fontWeight: 'bold', border: '1px solid #c7d2fe' }}>
             Sigit Prakoso <span style={{ color: '#2563eb', fontWeight: 'bold' }}>(Owner)</span>
           </span>
-
-          <button style={{ padding: '8px 16px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
-            + Tambah Transaksi
-          </button>
         </div>
 
       </div>

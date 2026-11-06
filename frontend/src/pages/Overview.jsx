@@ -10,12 +10,18 @@ export default function Overview() {
   return (
     <div style={{ width: '100%', fontFamily: 'Arial, sans-serif', boxSizing: 'border-box' }}>
       
-      {/* Header Halaman */}
-      <div style={{ marginBottom: '25px' }}>
-        <h2 style={{ margin: 0, color: '#0f172a', fontSize: '26px' }}>Dashboard Overview</h2>
-        <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>
-          PT Perdagangan Bahari Koh Ahong - Pusat Komoditas Ikan Segar B2B.
-        </p>
+      {/* Header Halaman & Tombol Tambah Transaksi di Bawah Sebelah Kanan */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px', flexWrap: 'wrap', gap: '15px' }}>
+        <div>
+          <h2 style={{ margin: 0, color: '#0f172a', fontSize: '26px' }}>Dashboard Overview</h2>
+          <p style={{ margin: '5px 0 0 0', color: '#64748b', fontSize: '14px' }}>
+            PT Perdagangan Bahari Koh Ahong - Pusat Komoditas Ikan Segar B2B.
+          </p>
+        </div>
+
+        <button style={{ padding: '10px 20px', backgroundColor: '#2563eb', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+          + Tambah Transaksi
+        </button>
       </div>
 
       {/* 4 Stat Cards */}
