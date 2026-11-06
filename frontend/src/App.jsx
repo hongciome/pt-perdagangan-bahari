@@ -37,10 +37,10 @@ function MainContent({ sidebarOpen, setSidebarOpen }) {
   const currentPage = pageTitles[location.pathname] || 'Dashboard';
 
   return (
-    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflowY: 'auto' }}>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflowY: 'auto', backgroundColor: '#f8fafc' }}>
       
       {/* Top Header Bar */}
-      <div style={{ padding: '16px 24px 8px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <div style={{ padding: '16px 24px 8px 24px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', borderBottom: '1px solid #e2e8f0' }}>
         <button 
           onClick={() => setSidebarOpen(!sidebarOpen)}
           style={{ 
@@ -72,7 +72,7 @@ function MainContent({ sidebarOpen, setSidebarOpen }) {
       </div>
 
       {/* Area Konten Utama */}
-      <div style={{ flex: 1, overflowY: 'auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
         <Routes>
           <Route path="/" element={<Overview />} />
           <Route path="/customers" element={<Customers />} />
@@ -99,8 +99,21 @@ export default function App() {
 
   return (
     <Router>
-      <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', overflow: 'hidden' }}>
-        <Sidebar isOpen={sidebarOpen} />
+      {/* Pembungkus Utama Flexbox agar Sidebar dan Konten Sejajar Rapi */}
+      <div style={{ display: 'flex', width: '100vw', height: '100vh', backgroundColor: '#f8fafc', overflow: 'hidden' }}>
+        
+        {/* Kontainer Sidebar dengan Pengaturan Lebar Dinamis Berdasarkan State */}
+        <div style={{ 
+          width: sidebarOpen ? '260px' : '0px', 
+          flexShrink: 0, 
+          height: '100vh', 
+          transition: 'width 0.3s ease', 
+          overflow: 'hidden',
+          backgroundColor: '#0f172a' 
+        }}>
+          <Sidebar isOpen={sidebarOpen} />
+        </div>
+
         <MainContent sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
       </div>
     </Router>
